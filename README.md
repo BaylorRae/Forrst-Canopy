@@ -1,19 +1,19 @@
-## Forrst Cannopy
-Cannopy is a PHP wrapper for the Forrst API.
+## Forrst Canopy
+canopy is a PHP wrapper for the Forrst API.
 
 ## Getting Started
 
 	<?php
-	  include 'forrst-cannopy.php';
+	  include 'forrst-canopy.php';
 
-	  $cannopy = new ForrstCannopy('BaylorRae');
+	  $canopy = new ForrstCanopy('BaylorRae');
 	
 	  // Get the user's name
-	  echo $cannopy->user->name;
+	  echo $canopy->user->name;
 	?>
 
 ## Getting User Info
-The user's information is stored in a variable referenced as `$cannopy->user->(name|url)`
+The user's information is stored in a variable referenced as `$canopy->user->(name|url)`
 
 Here's a list of what can be called
 
@@ -26,7 +26,7 @@ Here's a list of what can be called
 * likes (like count)
 * followers (followers count)
 * following (following count)
-* photos (array) `$cannopy->user->photos['medium_url']`
+* photos (array) `$canopy->user->photos['medium_url']`
  * xl\_url
  * large\_url
  * medium\_url
@@ -38,7 +38,7 @@ Here's a list of what can be called
 
 ## Getting User Posts
 
-Posts can be called two different ways. When working with the user supplied when initializing `ForrstCannopy` you can use the following functions. Each of the functions accept a parameter to set the limit.
+Posts can be called two different ways. When working with the user supplied when initializing `ForrstCanopy` you can use the following functions. Each of the functions accept a parameter to set the limit.
 
 * get\_user\_snaps
 * get\_user\_code
@@ -46,17 +46,17 @@ Posts can be called two different ways. When working with the user supplied when
 * get\_user\_questions
 
         // Get the last three posts with type=code
-        $latest_code = $cannopy->get_user_code(3);
+        $latest_code = $canopy->get_user_code(3);
 
 ---
 The second method allows you to change the user that is being referenced. Giving you control to pull posts from other users.
 
     // Using an array
-    $posts = $cannopy->get_posts(array(
+    $posts = $canopy->get_posts(array(
         'limit' => 3,
         'type' => 'code',
         'username' => 'another_user' // defaults to original username
         ));
         
     // Passing the data in as a string
-    $cannopy->get_posts('limit=3&type=code&username=another_user');
+    $canopy->get_posts('limit=3&type=code&username=another_user');

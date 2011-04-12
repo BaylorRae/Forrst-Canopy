@@ -1,7 +1,7 @@
 <?php
 
 // Handles all of the url requests
-class ForrstCannopyCurl {
+class ForrstCanopyCurl {
   private $curl = null; // CURL instance
   private $response = null; // The returned data from CURL
   
@@ -47,13 +47,13 @@ class ForrstCannopyCurl {
   }
 }
 
-class ForrstCannopy {
+class ForrstCanopy {
   public $user;
   
   function __construct($username) {
         
     // Get the user's information
-    $request = new ForrstCannopyCurl;
+    $request = new ForrstCanopyCurl;
     $info = $request->getJSON(sprintf('info?username=%s', $username));
     
     // Make sure we recieved valid data
@@ -102,7 +102,7 @@ class ForrstCannopy {
     if( !empty($options['type']) )
       $url .= sprintf('&type=%s', $options['type']);
     
-    $request = new ForrstCannopyCurl;
+    $request = new ForrstCanopyCurl;
     return $request->getJSON(sprintf($url, $username));
   }
         
