@@ -10,7 +10,7 @@ include 'forrst-canopy.php';
 
 // post id: 70743
 // post tiny_id: OIm
-// $post = ForrstCanopy\Posts::post(70743);
+// $post = ForrstCanopy\Posts::show(70743);
 
 // $all_posts = ForrstCanopy\Posts::all();
 
