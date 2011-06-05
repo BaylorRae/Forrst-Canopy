@@ -1,9 +1,13 @@
 <?php
 
+
+namespace ForrstCanopy;
+
 // Handles all of the url requests
 class ForrstCanopyCurl {
   private $curl = null; // CURL instance
   private $response = null; // The returned data from CURL
+class Curl {
   
   const API_BASE = 'http://api.forrst.com/api/v2/users/';
   
