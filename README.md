@@ -29,4 +29,3 @@ Notice that `User::posts` has a second parameter. When an API method supports ex
 
 ## Todo
 0. Add support for servers that don't have curl
-0. Add exceptions for request errors.
