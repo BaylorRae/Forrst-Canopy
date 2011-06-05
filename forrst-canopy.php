@@ -1,28 +1,29 @@
 <?php
 
+// TODO: Add exceptions
 
 namespace ForrstCanopy;
 
 // Handles all of the url requests
-class ForrstCanopyCurl {
-  private $curl = null; // CURL instance
-  private $response = null; // The returned data from CURL
 class Curl {
+  private static $curl = null; // CURL instance
+  private static $response = null; // The returned data from CURL
   
-  const API_BASE = 'http://api.forrst.com/api/v2/users/';
+  const API_BASE = 'http://forrst.com/api/v2/';
   
-  public function getJSON($url) {
-    $this->curl = curl_init($this->checkURL($url));
-    $this->setOptions();
+  public static function getJSON($url) {
+    self::$curl = curl_init(self::checkURL($url));
+    self::setOptions();
     
-    $this->response = json_decode(curl_exec($this->curl));
-    curl_close($this->curl);
-    
+    self::$response = json_decode(curl_exec(self::$curl));
+    curl_close(self::$curl);
+        
     // Make sure everything was okay
-    if( $this->response->stat != 'ok' )
+    if( self::$response->stat != 'ok' ) {
       return false;
+    }
     
-    return $this->response;
+    return self::$response;
   }
   
   /**
@@ -32,8 +33,8 @@ class Curl {
    * @author Baylor Rae'
    */
   private function setOptions() {
-    if( !empty($this->curl) ) {
-      curl_setopt_array($this->curl, array(
+    if( !empty(self::$curl) ) {
+      curl_setopt_array(self::$curl, array(
           CURLOPT_RETURNTRANSFER => true
         ));
     }
@@ -46,68 +47,68 @@ class Curl {
    * @return void
    * @author Baylor Rae'
    */
-  private function checkURL($url) {
+  private static function checkURL($url) {
     return (preg_match('/^http(s)?:\/\//', $url)) ? $url : self::API_BASE . $url;
   }
 }
 
-class ForrstCanopy {
-  public $user;
+class Users {
+  private $authed = false;
   
-  function __construct($username) {
-        
-    // Get the user's information
-    $request = new ForrstCanopyCurl;
-    $info = $request->getJSON(sprintf('info?username=%s', $username));
-    
-    // Make sure we recieved valid data
-    if( empty($info) ) {
-      echo '<p>The user could not be found.</p>';
-    }
-    
-    // Save the user's info as an array
-    $this->user = $info->resp;
-    
-    // Create user tag_array
-    $this->user->tag_array = explode(',', $this->user->tag_string);
-    
-    // Change photos into an array
-    $this->user->photos = (array) $this->user->photos;
+  // TODO: Add authentication when it's live
+  function __construct($email_or_username, $password) {
+    if( Curl::getJSON(sprintf('users/auth?email_or_username=%&password=%', $email_or_username, $password)) )
+      $this->authed = true;
   }
   
-  // Allows active record approach
-  // get_user_(post type) e.g. get_user_snaps()
-  function __call($func, $args) {
-    // Check if we're pulling user info
-    if( preg_match('/^get_user_(\w+)/', $func, $matches) ) {
-      $type = (substr($matches[1], -1) == 's') ? substr($matches[1], 0, -1) : $matches[1];
-      return $this->get_posts(array(
-        'type' => $type,
-        'limit' => (empty($args[0])) ? null : $args[0]
-        ));
-    }
+  public static function info($username) {
+    $means = (is_string($username)) ? 'username' : 'id';
+    $info = Curl::getJSON(sprintf('users/info?%s=%s', $means, $username));
+    
+    return $info;
   }
   
-  /**
-   * Returns posts from a user
-   *
-   * @param array $options ['limit', 'type', 'username']
-   * @return void
-   * @author Baylor Rae'
-   */
-  public function get_posts($options = null) {
-    $options = (is_string($options)) ? parse_url($options) : $options;
-    $username = (empty($options['username'])) ? $this->user->username : $options['username'];
-    $url = 'posts?username=%s';
+  public static function posts($username, $params = null) {
+    $means = (is_string($username)) ? 'username' : 'id';
+    $url = sprintf('users/posts?%s=%s', $means, $username);
     
-    if( !empty($options['limit']) )
-      $url .= sprintf('&limit=%s', $options['limit']);
+    if( $params !== null )
+      $url .= '&' . $params;
+          
+    return Curl::getJSON($url);
+  }
+    
+}
+class_alias('ForrstCanopy\Users', __NAMESPACE__ . '\User');
+
+class Posts {
+    
+  public static function post($id) {
+    $means = (is_string($id)) ? 'tiny_id' : 'id';
+    return Curl::getJSON(sprintf('posts/show?%s=%s', $means, $id));
+  }
+  
+  public static function all($after = null) {
+    $url = 'posts/all';
+    
+    if( $after !== null )
+      $url .= sprintf('?after=%s', $after);
       
-    if( !empty($options['type']) )
-      $url .= sprintf('&type=%s', $options['type']);
-    
-    $request = new ForrstCanopyCurl;
-    return $request->getJSON(sprintf($url, $username));
+    return Curl::getJSON($url);
   }
-        
+  
+  public static function _list($post_type, $params = null) {
+    $url = sprintf('posts/list?post_type=%s', $post_type);
+    
+    if( $params !== null )
+      $url .= '&' . $params;
+      
+    return Curl::getJSON($url);
+  }
+  
+}
+class_alias('ForrstCanopy\Posts', __NAMESPACE__ . '\Post');
+
+function stats() {
+  return Curl::getJSON('stats');
 }
