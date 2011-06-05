@@ -1,13 +1,30 @@
 <?php
 
-// TODO: Add exceptions
-
 namespace ForrstCanopy;
+
+class Exception extends \Exception {
+  public $authed, $authed_as;
+  
+  function __construct($data, $code = 0) {
+    $this->authed = $data['authed'];
+    $this->authed_as = $data['authed_as'];
+    parent::__construct($data['message'], $code);
+  }
+    
+  public function __toString() {
+    $info = '<b>ForrstCanopy\Exception</b>: ' . $this->message;
+    
+    $info .= '<pre>' . print_r(self::getTrace(), 1) . '</pre>';
+    
+    return $info;
+  }
+  
+}
 
 // Handles all of the url requests
 class Curl {
   private static $curl = null; // CURL instance
-  private static $response = null; // The returned data from CURL
+  public static $response = null; // The returned data from CURL
   
   const API_BASE = 'http://forrst.com/api/v2/';
   
@@ -19,9 +36,8 @@ class Curl {
     curl_close(self::$curl);
         
     // Make sure everything was okay
-    if( self::$response->stat != 'ok' ) {
+    if( self::$response->stat != 'ok' )
       return false;
-    }
     
     return self::$response;
   }
@@ -57,9 +73,15 @@ class Users {
   
   // TODO: Add authentication when it's live
   function __construct($email_or_username, $password) {
-    if( Curl::getJSON(sprintf('users/auth?email_or_username=%&password=%', $email_or_username, $password)) )
     if( Curl::getJSON(sprintf('users/auth?email_or_username=%s&password=%s', $email_or_username, $password)) ) {
       $this->authed = true;
+    }else {
+      throw new Exception(array(
+        'message' => Curl::$response->resp->error,
+        'authed' => Curl::$response->authed,
+        'authed_as' => Curl::$response->authed_as
+      ));
+    }
   }
   
   /**
