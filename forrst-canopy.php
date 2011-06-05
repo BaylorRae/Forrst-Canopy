@@ -51,7 +51,8 @@ class Curl {
   private function setOptions() {
     if( !empty(self::$curl) ) {
       curl_setopt_array(self::$curl, array(
-          CURLOPT_RETURNTRANSFER => true
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_USERAGENT => 'Forrst Canopy'
         ));
     }
   }
