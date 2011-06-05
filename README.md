@@ -1,62 +1,32 @@
-## Forrst Canopy
-canopy is a PHP wrapper for the Forrst API.
+## About
+Forrst Canopy is an API wrapper for the [Forrst API](http://forrst.com/api).
 
-## Getting Started
+## Conventions Used
+Canopy uses `ForrstCanopy` as its namespace. In addition, it separates the available methods into individual classes. Therefore, to pull information about a user you would do something like this.
 
-	<?php
-	  include 'forrst-canopy.php';
+    $user_info = ForrstCanopy\User::info('BaylorRae');
+    
+    // Get a user's posts
+    $user_posts = ForrstCanopy\User::posts('BaylorRae', 'type=code&limit=3');
+    
+Notice that `User::posts` has a second parameter. When an API method supports extra parameters you use the syntax showed above.
 
-	  $canopy = new ForrstCanopy('BaylorRae');
-	
-	  // Get the user's name
-	  echo $canopy->user->name;
-	?>
+## Available Methods
+**!note** - `$params` use a query string format. Look at the code above for `User::posts`
 
-## Getting User Info
-The user's information is stored in a variable referenced as `$canopy->user->(name|url)`
+- ForrstCanopy\stats()<br /> <http://forrst.com/api#m-stats>
 
-Here's a list of what can be called
+### User
+**!important** - Authentication coming soon
 
-* id
-* username 
-* name
-* url
-* posts (post count)
-* comments (comment count)
-* likes (like count)
-* followers (followers count)
-* following (following count)
-* photos (array) `$canopy->user->photos['medium_url']`
- * xl\_url
- * large\_url
- * medium\_url
- * small\_url
- * thumb\_url
-* in\_directory
-* tag\_string
-* tag\_array
+- ForrstCanopy\User::info($username\_or\_id)<br /> <http://forrst.com/api#m-users-info>
+- ForrstCanopy\User::posts($username\_or\_id, $params = null)<br /> <http://forrst.com/api#m-user-posts>
 
-## Getting User Posts
+### Posts
+- ForrstCanopy\Posts::show($id\_or\_tiny\_id)<br /> <http://forrst.com/api#m-posts-show>
+- ForrstCanopy\Posts::all($after = null)<br /> <http://forrst.com/api#m-posts-all>
+- ForrstCanopy\Posts::\_list($post_type, $params = null)<br /> <http://forrst.com/api#m-posts-list>
 
-Posts can be called two different ways. When working with the user supplied when initializing `ForrstCanopy` you can use the following functions. Each of the functions accept a parameter to set the limit.
-
-* get\_user\_snaps
-* get\_user\_code
-* get\_user\_links
-* get\_user\_questions
-
-        // Get the last three posts with type=code
-        $latest_code = $canopy->get_user_code(3);
-
----
-The second method allows you to change the user that is being referenced. Giving you control to pull posts from other users.
-
-    // Using an array
-    $posts = $canopy->get_posts(array(
-        'limit' => 3,
-        'type' => 'code',
-        'username' => 'another_user' // defaults to original username
-        ));
-        
-    // Passing the data in as a string
-    $canopy->get_posts('limit=3&type=code&username=another_user');
+## Todo
+0. Add support for servers that don't have curl
+0. Add exceptions for request errors.
