@@ -61,16 +61,33 @@ class Users {
       $this->authed = true;
   }
   
-  public static function info($username) {
-    $means = (is_string($username)) ? 'username' : 'id';
-    $info = Curl::getJSON(sprintf('users/info?%s=%s', $means, $username));
+  /**
+   * Returns information about a given user
+   *
+   * @param mixed $username_or_id 
+   * @return (object) with information about the user
+   * @author Baylor Rae'
+   * @see http://forrst.com/api#m-users-info
+   */
+  public static function info($username_or_id) {
+    $means = (is_string($username_or_id)) ? 'username' : 'id';
+    $info = Curl::getJSON(sprintf('users/info?%s=%s', $means, $username_or_id));
     
     return $info;
   }
   
-  public static function posts($username, $params = null) {
-    $means = (is_string($username)) ? 'username' : 'id';
-    $url = sprintf('users/posts?%s=%s', $means, $username);
+  /**
+   * Get all posts from a given user
+   *
+   * @param mixed $username_or_id 
+   * @param string $params (optional)
+   * @return (array) with all posts
+   * @author Baylor Rae'
+   * @see http://forrst.com/api#m-user-posts
+   */
+  public static function posts($username_or_id, $params = null) {
+    $means = (is_string($username_or_id)) ? 'username' : 'id';
+    $url = sprintf('users/posts?%s=%s', $means, $username_or_id);
     
     if( $params !== null )
       $url .= '&' . $params;
@@ -82,12 +99,32 @@ class Users {
 class_alias('ForrstCanopy\Users', __NAMESPACE__ . '\User');
 
 class Posts {
-    
-  public static function post($id) {
+  
+  /**
+   * Get data about a single post.
+   *  Note: 
+   *  - Questions: content is the question.
+   *  - Code: content contains the code snippet.
+   *  - For code, snaps, and links, description is the post description; it is not used for questions.
+   *
+   * @param mixed $id use string for tiny_id
+   * @return (object) information about a specific post
+   * @author Baylor Rae'
+   * @see http://forrst.com/api#m-posts-show
+   */
+  public static function show($id) {
     $means = (is_string($id)) ? 'tiny_id' : 'id';
     return Curl::getJSON(sprintf('posts/show?%s=%s', $means, $id));
   }
   
+  /**
+   * Gets all posts in reverse chronological order
+   *
+   * @param int $after (optional)
+   * @return (array) of all recent posts
+   * @author Baylor Rae'
+   * @see http://forrst.com/api#m-posts-all
+   */
   public static function all($after = null) {
     $url = 'posts/all';
     
@@ -97,6 +134,15 @@ class Posts {
     return Curl::getJSON($url);
   }
   
+  /**
+   * Gets all posts of a specific type
+   *
+   * @param string $post_type ['code', 'link', 'question', 'snap']
+   * @param string $params (optional)
+   * @return void
+   * @author Baylor Rae'
+   * @see http://forrst.com/api#m-posts-list
+   */
   public static function _list($post_type, $params = null) {
     $url = sprintf('posts/list?post_type=%s', $post_type);
     
@@ -109,6 +155,13 @@ class Posts {
 }
 class_alias('ForrstCanopy\Posts', __NAMESPACE__ . '\Post');
 
+/**
+ * Returns all API status
+ *
+ * @return (object)
+ * @author Baylor Rae'
+ * @see http://forrst.com/api#m-stats
+ */
 function stats() {
   return Curl::getJSON('stats');
 }
