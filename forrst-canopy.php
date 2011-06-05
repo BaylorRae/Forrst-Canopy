@@ -24,7 +24,7 @@ class Exception extends \Exception {
 // Handles all of the url requests
 class Curl {
   private static $curl = null; // CURL instance
-  public static $response = null; // The returned data from CURL
+  private static $response = null; // The returned data from CURL
   
   const API_BASE = 'http://forrst.com/api/v2/';
   
@@ -66,6 +66,20 @@ class Curl {
   private static function checkURL($url) {
     return (preg_match('/^http(s)?:\/\//', $url)) ? $url : self::API_BASE . $url;
   }
+  
+  /**
+   * Returns information about the response
+   *
+   * @return array
+   * @author Baylor Rae'
+   */
+  public function exceptionData() {
+    return array(
+      'message' => self::$response->resp->error,
+      'authed' => self::$response->authed,
+      'authed_as' => self::$response->authed_as
+    );
+  }
 }
 
 class Users {
@@ -76,11 +90,7 @@ class Users {
     if( Curl::getJSON(sprintf('users/auth?email_or_username=%s&password=%s', $email_or_username, $password)) ) {
       $this->authed = true;
     }else {
-      throw new Exception(array(
-        'message' => Curl::$response->resp->error,
-        'authed' => Curl::$response->authed,
-        'authed_as' => Curl::$response->authed_as
-      ));
+      throw new Exception(Curl::exceptionData());
     }
   }
   
