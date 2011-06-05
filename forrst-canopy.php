@@ -58,6 +58,7 @@ class Users {
   // TODO: Add authentication when it's live
   function __construct($email_or_username, $password) {
     if( Curl::getJSON(sprintf('users/auth?email_or_username=%&password=%', $email_or_username, $password)) )
+    if( Curl::getJSON(sprintf('users/auth?email_or_username=%s&password=%s', $email_or_username, $password)) ) {
       $this->authed = true;
   }
   
