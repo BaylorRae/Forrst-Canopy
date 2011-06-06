@@ -12,7 +12,7 @@ class Exception extends \Exception {
   }
     
   public function __toString() {
-    $info = '<b>ForrstCanopy\Exception</b>: ' . $this->message;
+    $info = '<b>' . __NAMESPACE__ . '\Exception</b>: ' . $this->message;
     
     $info .= '<pre>' . print_r(self::getTrace(), 1) . '</pre>';
     
