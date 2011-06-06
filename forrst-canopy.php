@@ -123,9 +123,13 @@ class Users {
     $means = (is_string($username_or_id)) ? 'username' : 'id';
     $url = sprintf('users/posts?%s=%s', $means, $username_or_id);
     
-    if( $params !== null )
-      $url .= '&' . $params;
-          
+    if( $params !== null ) {
+      foreach ($params as $k => $v) {
+        //TODO Error / Type checking
+        $url .= "&$k=$v";
+      }
+    }
+    
     return Curl::getJSON($url);
   }
     
@@ -179,9 +183,13 @@ class Posts {
    */
   public static function _list($post_type, $params = null) {
     $url = sprintf('posts/list?post_type=%s', $post_type);
-    
-    if( $params !== null )
-      $url .= '&' . $params;
+        
+    if( $params !== null ) {
+      foreach ($params as $k => $v) {
+        //TODO Error / Type checking
+        $url .= "&$k=$v";
+      }
+    }
       
     return Curl::getJSON($url);
   }
