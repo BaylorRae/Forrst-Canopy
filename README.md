@@ -12,20 +12,7 @@ Canopy uses `ForrstCanopy` as its namespace. In addition, it separates the avail
 Notice that `User::posts` has a second parameter. When an API method supports extra parameters you use the syntax showed above.
 
 ## Available Methods
-**!note** - `$params` use a query string format. Look at the code above for `User::posts`
-
-- ForrstCanopy\stats()<br /> <http://forrst.com/api#m-stats>
-
-### User
-**!important** - Authentication coming soon
-
-- ForrstCanopy\User::info($username\_or\_id)<br /> <http://forrst.com/api#m-users-info>
-- ForrstCanopy\User::posts($username\_or\_id, $params = null)<br /> <http://forrst.com/api#m-user-posts>
-
-### Posts
-- ForrstCanopy\Posts::show($id\_or\_tiny\_id)<br /> <http://forrst.com/api#m-posts-show>
-- ForrstCanopy\Posts::all($after = null)<br /> <http://forrst.com/api#m-posts-all>
-- ForrstCanopy\Posts::\_list($post_type, $params = null)<br /> <http://forrst.com/api#m-posts-list>
+Look at the wiki for list of methods with their documentation.<br /><https://github.com/BaylorRae/Forrst-Canopy/wiki>
 
 ## Todo
 0. Add support for servers that don't have curl
