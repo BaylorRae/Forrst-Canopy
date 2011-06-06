@@ -7,7 +7,7 @@ Canopy uses `ForrstCanopy` as its namespace. In addition, it separates the avail
     $user_info = ForrstCanopy\User::info('BaylorRae');
     
     // Get a user's posts
-    $user_posts = ForrstCanopy\User::posts('BaylorRae', 'type=code&limit=3');
+    $user_posts = ForrstCanopy\User::posts('BaylorRae', array('type' => 'code', 'limit' => 3));
     
 Notice that `User::posts` has a second parameter. When an API method supports extra parameters you use the syntax showed above.
 
