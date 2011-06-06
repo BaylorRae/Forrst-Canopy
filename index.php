@@ -6,7 +6,7 @@ include 'forrst-canopy.php';
 // $user = ForrstCanopy\User::info('BaylorRae');
 
 // $posts = ForrstCanopy\User::posts('BaylorRae');
-// $posts = ForrstCanopy\User::posts('BaylorRae', 'type=code&limit=3');
+// $posts = ForrstCanopy\User::posts('BaylorRae', array('type' => 'code', 'limit' => 3));
 
 // post id: 70743
 // post tiny_id: OIm
