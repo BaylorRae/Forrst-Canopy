@@ -16,11 +16,3 @@ include 'forrst-canopy.php';
 
 // $list_posts = ForrstCanopyPosts::_list('code'); // ['code', 'link', 'snap', 'question']
 // $list_posts = ForrstCanopyPosts::_list('code', 'page=2');
-
-// Will be added later
-// $user = new ForrstCanopyUser('BaylorRae', 'k6ZZKleRp5g3kv');
-try {
-  $user = new ForrstCanopyUser('BaylorRae', 'k6ZZKleRp5g3kv');
-}catch( ForrstCanopyException $e ) {
-  echo $e;
-}
