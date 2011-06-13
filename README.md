@@ -2,12 +2,12 @@
 Forrst Canopy is an API wrapper for the [Forrst API](http://forrst.com/api).
 
 ## Conventions Used
-Canopy uses `ForrstCanopy` as its namespace. In addition, it separates the available methods into individual classes. Therefore, to pull information about a user you would do something like this.
+Canopy separates the available methods into individual classes. Therefore, to pull information about a user you would do something like this.
 
-    $user_info = ForrstCanopy\User::info('BaylorRae');
+    $user_info = ForrstCanopyUser::info('BaylorRae');
     
     // Get a user's posts
-    $user_posts = ForrstCanopy\User::posts('BaylorRae', array('type' => 'code', 'limit' => 3));
+    $user_posts = ForrstCanopyUser::posts('BaylorRae', array('type' => 'code', 'limit' => 3));
     
 Notice that `User::posts` has a second parameter. When an API method supports extra parameters you use the syntax showed above.
 
