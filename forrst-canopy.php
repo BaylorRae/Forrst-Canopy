@@ -1,8 +1,6 @@
 <?php
 
-namespace ForrstCanopy;
-
-class Exception extends \Exception {
+class ForrstCanopyException extends Exception {
   public $authed, $authed_as;
   
   function __construct($data, $code = 0) {
@@ -12,9 +10,14 @@ class Exception extends \Exception {
   }
     
   public function __toString() {
-    $info = '<b>' . __NAMESPACE__ . '\Exception</b>: ' . $this->message;
+    $style = 'style="font-family: Helvetica;"';
+    $info =  "<p $style>Something went wrong with the last request to the Forrst API</p>";
+    $info .= "<h2 $style>Details</h2><strong $style>Message</strong>: " . $this->message . '<br />';
+    $info .= "<p $style><strong>File:</strong> " . $this->file . '</p>';
+    $info .= "<p $style><strong>Line:</strong> " . $this->line . '</p>';
+    $info .= "<h2 $style>Trace</h2>";
     
-    $info .= '<pre>' . print_r(self::getTrace(), 1) . '</pre>';
+    $info .= '<pre style="background: #eee; padding: 5px;">' . print_r($this->getTrace(), 1) . '</pre>';
     
     return $info;
   }
@@ -22,7 +25,7 @@ class Exception extends \Exception {
 }
 
 // Handles all of the url requests
-class Curl {
+class ForrstCanopyCurl {
   private static $curl = null; // CURL instance
   private static $response = null; // The returned data from CURL
   
@@ -83,15 +86,15 @@ class Curl {
   }
 }
 
-class Users {
+class ForrstCanopyUsers {
   private $authed = false;
   
   // TODO: Add authentication when it's live
   function __construct($email_or_username, $password) {
-    if( Curl::getJSON(sprintf('users/auth?email_or_username=%s&password=%s', $email_or_username, $password)) ) {
+    if( ForrstCanopyCurl::getJSON(sprintf('users/auth?email_or_username=%s&password=%s', $email_or_username, $password)) ) {
       $this->authed = true;
     }else {
-      throw new Exception(Curl::exceptionData());
+      throw new ForrstCanopyException(ForrstCanopyCurl::exceptionData());
     }
   }
   
@@ -105,7 +108,7 @@ class Users {
    */
   public static function info($username_or_id) {
     $means = (is_string($username_or_id)) ? 'username' : 'id';
-    $info = Curl::getJSON(sprintf('users/info?%s=%s', $means, $username_or_id));
+    $info = ForrstCanopyCurl::getJSON(sprintf('users/info?%s=%s', $means, $username_or_id));
     
     return $info;
   }
@@ -130,13 +133,13 @@ class Users {
       }
     }
     
-    return Curl::getJSON($url);
+    return ForrstCanopyCurl::getJSON($url);
   }
     
 }
-class_alias('ForrstCanopy\Users', __NAMESPACE__ . '\User');
+class_alias('ForrstCanopyUsers', 'ForrstCanopyUser');
 
-class Posts {
+class ForrstCanopyPosts {
   
   /**
    * Get data about a single post.
@@ -152,7 +155,7 @@ class Posts {
    */
   public static function show($id) {
     $means = (is_string($id)) ? 'tiny_id' : 'id';
-    return Curl::getJSON(sprintf('posts/show?%s=%s', $means, $id));
+    return ForrstCanopyCurl::getJSON(sprintf('posts/show?%s=%s', $means, $id));
   }
   
   /**
@@ -169,7 +172,7 @@ class Posts {
     if( $after !== null )
       $url .= sprintf('?after=%s', $after);
       
-    return Curl::getJSON($url);
+    return ForrstCanopyCurl::getJSON($url);
   }
   
   /**
@@ -191,11 +194,11 @@ class Posts {
       }
     }
       
-    return Curl::getJSON($url);
+    return ForrstCanopyCurl::getJSON($url);
   }
   
 }
-class_alias('ForrstCanopy\Posts', __NAMESPACE__ . '\Post');
+class_alias('ForrstCanopyPosts', 'ForrstCanopyPost');
 
 /**
  * Returns all API status
@@ -204,6 +207,6 @@ class_alias('ForrstCanopy\Posts', __NAMESPACE__ . '\Post');
  * @author Baylor Rae'
  * @see http://forrst.com/api#m-stats
  */
-function stats() {
-  return Curl::getJSON('stats');
+function ForrstCanopy_stats() {
+  return ForrstCanopyCurl::getJSON('stats');
 }

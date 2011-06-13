@@ -1,21 +1,26 @@
 <?php
 include 'forrst-canopy.php';
 
-// $stats = ForrstCanopy\stats();
+// $stats = ForrstCanopy_stats();
 
-// $user = ForrstCanopy\User::info('BaylorRae');
+// $user = ForrstCanopyUser::info('BaylorRae');
 
-// $posts = ForrstCanopy\User::posts('BaylorRae');
-// $posts = ForrstCanopy\User::posts('BaylorRae', array('type' => 'code', 'limit' => 3));
+// $posts = ForrstCanopyUser::posts('BaylorRae', array('limit' => 1));
+// $posts = ForrstCanopyUser::posts('BaylorRae', array('type' => 'code', 'limit' => 3));
 
 // post id: 70743
 // post tiny_id: OIm
-// $post = ForrstCanopy\Posts::show(70743);
+// $post = ForrstCanopyPosts::show(70743);
 
-// $all_posts = ForrstCanopy\Posts::all();
+// $all_posts = ForrstCanopyPosts::all();
 
-// $list_posts = ForrstCanopy\Posts::_list('code'); // ['code', 'link', 'snap', 'question']
-// $list_posts = ForrstCanopy\Posts::_list('code', 'page=2');
+// $list_posts = ForrstCanopyPosts::_list('code'); // ['code', 'link', 'snap', 'question']
+// $list_posts = ForrstCanopyPosts::_list('code', 'page=2');
 
 // Will be added later
-// $user = new ForrstCanopy\User('BaylorRae', 'k6ZZKleRp5g3kv');
+// $user = new ForrstCanopyUser('BaylorRae', 'k6ZZKleRp5g3kv');
+try {
+  $user = new ForrstCanopyUser('BaylorRae', 'k6ZZKleRp5g3kv');
+}catch( ForrstCanopyException $e ) {
+  echo $e;
+}
