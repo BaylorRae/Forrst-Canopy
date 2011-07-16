@@ -6,6 +6,7 @@ class ForrstCanopyException extends Exception {
   function __construct($data, $code = 0) {
     $this->authed = $data['authed'];
     $this->authed_as = $data['authed_as'];
+    $this->url = $data['url'];
     parent::__construct($data['message'], $code);
   }
     
@@ -15,34 +16,76 @@ class ForrstCanopyException extends Exception {
     $info .= "<h2 $style>Details</h2><strong $style>Message</strong>: " . $this->message . '<br />';
     $info .= "<p $style><strong>File:</strong> " . $this->file . '</p>';
     $info .= "<p $style><strong>Line:</strong> " . $this->line . '</p>';
+    $info .= "<p $style><strong>URL:</strong> " . $this->url . '</p>';
     $info .= "<h2 $style>Trace</h2>";
     
-    $info .= '<pre style="background: #eee; padding: 5px;">' . print_r($this->getTrace(), 1) . '</pre>';
+    $info .= '<pre style="background: #eee; padding: 5px;">' . print_r($this->getTraceAsString(), 1) . '</pre>';
     
     return $info;
   }
-  
+    
 }
 
 // Handles all of the url requests
 class ForrstCanopyCurl {
   private static $curl = null; // CURL instance
   private static $response = null; // The returned data from CURL
+  private static $last_url = null; // Store the last url used
+  private static $curl_options = array();
   
-  const API_BASE = 'http://forrst.com/api/v2/';
+  const API_BASE = 'https://forrst.com/api/v2/';
   
-  public static function getJSON($url) {
-    self::$curl = curl_init(self::checkURL($url));
+  /**
+   * Makes a CURL request to the Forrst API
+   *
+   * @param string $url must be checked with self::checkURL first
+   * @return false or self::$response
+   * @author Baylor Rae'
+   */
+  private static function request($url) {
+    self::$last_url = $url;
+    self::$curl = curl_init($url);
     self::setOptions();
     
     self::$response = json_decode(curl_exec(self::$curl));
     curl_close(self::$curl);
+    
+    if( empty(self::$response) )
+      return false;
         
     // Make sure everything was okay
     if( self::$response->stat != 'ok' )
       return false;
     
     return self::$response;
+  }
+  
+  /**
+   * Makes a GET request to the Forrst API
+   *
+   * @param string $url 
+   * @return false or self::$response
+   * @author Baylor Rae'
+   */
+  public static function getJSON($url) {
+    return self::request(self::checkURL($url));
+  }
+  
+  /**
+   * Makes a POST request to the Forrst API
+   *
+   * @param string $url 
+   * @param array $params 
+   * @return false or self::$response
+   * @author Baylor Rae'
+   */
+  public static function postJSON($url, $params) {    
+    self::$curl_options = array(
+      CURLOPT_POST => true,
+      CURLOPT_POSTFIELDS => $params
+    );
+    
+    return self::request(self::checkURL($url));
   }
   
   /**
@@ -55,8 +98,12 @@ class ForrstCanopyCurl {
     if( !empty(self::$curl) ) {
       curl_setopt_array(self::$curl, array(
           CURLOPT_RETURNTRANSFER => true,
-          CURLOPT_USERAGENT => 'Forrst Canopy'
-        ));
+          CURLOPT_USERAGENT => 'Forrst Canopy',
+          CURLOPT_SSL_VERIFYPEER => false // added to use https
+        ) + self::$curl_options);
+        
+      // reset options
+      self::$curl_options = array();
     }
   }
   
@@ -68,6 +115,8 @@ class ForrstCanopyCurl {
    * @author Baylor Rae'
    */
   private static function checkURL($url) {
+    if( $url === 'last_url' )
+      $url = self::$last_url;
     return (preg_match('/^http(s)?:\/\//', $url)) ? $url : self::API_BASE . $url;
   }
   
@@ -78,11 +127,21 @@ class ForrstCanopyCurl {
    * @author Baylor Rae'
    */
   public function exceptionData() {
-    return array(
-      'message' => self::$response->resp->error,
-      'authed' => self::$response->authed,
-      'authed_as' => self::$response->authed_as
-    );
+    if( empty(self::$response) ) {
+      return array(
+        'message' => "Didn't receive a response",
+        'authed' => false,
+        'authed_as' => null,
+        'url' => self::checkURL('last_url')
+      );
+    }else {
+      return array(
+        'message' => self::$response->resp->error,
+        'authed' => self::$response->authed,
+        'authed_as' => self::$response->authed_as,
+        'url' => self::checkURL('last_url')
+      );      
+    }
   }
 }
 
@@ -91,7 +150,7 @@ class ForrstCanopyUsers {
   
   // TODO: Add authentication when it's live
   function __construct($email_or_username, $password) {
-    if( ForrstCanopyCurl::getJSON(sprintf('users/auth?email_or_username=%s&password=%s', $email_or_username, $password)) ) {
+    if( ForrstCanopyCurl::postJSON('users/auth', array('email_or_username' => $email_or_username, 'password' => $password)) ) {
       $this->authed = true;
     }else {
       throw new ForrstCanopyException(ForrstCanopyCurl::exceptionData());
@@ -108,7 +167,8 @@ class ForrstCanopyUsers {
    */
   public static function info($username_or_id) {
     $means = (is_string($username_or_id)) ? 'username' : 'id';
-    $info = ForrstCanopyCurl::getJSON(sprintf('users/info?%s=%s', $means, $username_or_id));
+    if( !$info = ForrstCanopyCurl::getJSON(sprintf('users/info?%s=%s', $means, $username_or_id)) )
+      throw new ForrstCanopyException(ForrstCanopyCurl::exceptionData());
     
     return $info;
   }
@@ -133,7 +193,10 @@ class ForrstCanopyUsers {
       }
     }
     
-    return ForrstCanopyCurl::getJSON($url);
+    if( !$posts = ForrstCanopyCurl::getJSON($url) )
+      throw new ForrstCanopyException(ForrstCanopyCurl::exceptionData());
+    
+    return $posts;
   }
     
 }
@@ -155,7 +218,11 @@ class ForrstCanopyPosts {
    */
   public static function show($id) {
     $means = (is_string($id)) ? 'tiny_id' : 'id';
-    return ForrstCanopyCurl::getJSON(sprintf('posts/show?%s=%s', $means, $id));
+    
+    if( !$post = ForrstCanopyCurl::getJSON(sprintf('posts/show?%s=%s', $means, $id)) )
+      throw new ForrstCanopyException(ForrstCanopyCurl::exceptionData());
+    
+    return $post;
   }
   
   /**
@@ -172,7 +239,10 @@ class ForrstCanopyPosts {
     if( $after !== null )
       $url .= sprintf('?after=%s', $after);
       
-    return ForrstCanopyCurl::getJSON($url);
+    if( !$posts = ForrstCanopyCurl::getJSON($url) )
+      throw new ForrstCanopyException(ForrstCanopyCurl::exceptionData());
+      
+    return $posts;
   }
   
   /**
@@ -193,8 +263,11 @@ class ForrstCanopyPosts {
         $url .= "&$k=$v";
       }
     }
-      
-    return ForrstCanopyCurl::getJSON($url);
+    
+    if( !$posts = ForrstCanopyCurl::getJSON($url) )
+      throw new ForrstCanopyException(ForrstCanopyCurl::exceptionData());
+    
+    return $posts;
   }
   
 }
