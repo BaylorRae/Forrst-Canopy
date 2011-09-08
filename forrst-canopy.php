@@ -115,8 +115,12 @@ class ForrstCanopyCurl {
    * @author Baylor Rae'
    */
   private static function checkURL($url) {
+    
+    // this is used for throwing exceptions
+    // it makes sure the proper url is displayed
     if( $url === 'last_url' )
       $url = self::$last_url;
+    
     return (preg_match('/^http(s)?:\/\//', $url)) ? $url : self::API_BASE . $url;
   }
   
