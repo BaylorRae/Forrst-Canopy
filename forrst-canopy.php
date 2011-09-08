@@ -1,7 +1,7 @@
 <?php
 
 class ForrstCanopyException extends Exception {
-  public $authed, $authed_as;
+  public $authed, $authed_as, $url;
   
   function __construct($data, $code = 0) {
     $this->authed = $data['authed'];
